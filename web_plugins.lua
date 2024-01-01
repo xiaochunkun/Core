@@ -139,8 +139,8 @@ local function ListCurrentPlugins(a_EnabledPluginFolders)
 	local ins = table.insert
 	if (#EnabledPlugins > 0) then
 		ins(res, [[
-			<h4>Enabled plugins</h4>
-			<p>These plugins are enabled in the server settings:</p>
+			<h4>已启用的插件</h4>
+			<p>以下插件已被启用:</p>
 			<table>
 			]]
 		)
@@ -149,23 +149,23 @@ local function ListCurrentPlugins(a_EnabledPluginFolders)
 			-- Move and Disable buttons:
 			ins(res, "<tr><td>")
 			if (idx == 1) then
-				ins(res, [[<button type="button" disabled>Move Up</button> </td>]])
+				ins(res, [[<button type="button" disabled>上移</button> </td>]])
 			else
 				ins(res, '<form method="POST"><input type="hidden" name="PluginFolder" value="')
 				ins(res, plugin.Folder)
-				ins(res, '"><input type="submit" name="MoveUp" value="Move Up"></form></td>')
+				ins(res, '"><input type="submit" name="MoveUp" value="上移"></form></td>')
 			end
 			ins(res, [[<td>]])
 			if (idx == Num) then
-				ins(res, '<button type="button" disabled>Move Down</button></td>')
+				ins(res, '<button type="button" disabled>下移</button></td>')
 			else
 				ins(res, '<form method="POST"><input type="hidden" name="PluginFolder" value="')
 				ins(res, plugin.Folder)
-				ins(res, '"><input type="submit" name="MoveDown" value="Move Down"></form></td>')
+				ins(res, '"><input type="submit" name="MoveDown" value="下移"></form></td>')
 			end
 			ins(res, '<td><form method="POST"><input type="hidden" name="PluginFolder" value="')
 			ins(res, plugin.Folder)
-			ins(res, '"><input type="submit" name="DisablePlugin" value="Disable"></form></td>')
+			ins(res, '"><input type="submit" name="DisablePlugin" value="禁用"></form></td>')
 
 			-- Plugin name and, if different, folder:
 			ins(res, "<td nowrap>")
@@ -185,7 +185,7 @@ local function ListCurrentPlugins(a_EnabledPluginFolders)
 			elseif (plugin.Status == cPluginManager.psError) then
 				ins(res, "<b style='color: red'>")
 				if ((plugin.LoadError == nil) or (plugin.LoadError == "")) then
-					ins(res, "Unknown load error")
+					ins(res, "未知错误")
 				else
 					ins(res, plugin.LoadError)
 				end
@@ -198,14 +198,14 @@ local function ListCurrentPlugins(a_EnabledPluginFolders)
 
 	-- Output DisabledPlugins table:
 	if (#DisabledPlugins > 0) then
-		ins(res, [[<hr /><h4>Disabled plugins</h4>
-			<p>These plugins are installed, but are disabled in the configuration.</p>
+		ins(res, [[<hr /><h4>已禁用的插件</h4>
+			<p>以下插件已被安装，但被禁用了</p>
 			<table>]]
 		)
 		for idx, plugin in ipairs(DisabledPlugins) do
 			ins(res, '<tr><td><form method="POST"><input type="hidden" name="PluginFolder" value="')
 			ins(res, plugin.Folder)
-			ins(res, '"><input type="submit" name="EnablePlugin" value="Enable"></form></td><td width=\"100%\">')
+			ins(res, '"><input type="submit" name="EnablePlugin" value="启用"></form></td><td width=\"100%\">')
 			ins(res, plugin.Name)
 			ins(res, "</td></tr>")
 		end
@@ -294,11 +294,11 @@ local function ProcessRequestActions(SettingsIni, Request, EnabledPlugins)
 
 	if (Request.PostParams["DisablePlugin"] ~= nil) then
 		if (DisablePlugin(SettingsIni, PluginFolder, EnabledPlugins)) then
-			return '<p style="color: green;"><b>You disabled plugin: "' .. PluginFolder .. '"</b></p>'
+			return '<p style="color: green;"><b>已禁用: "' .. PluginFolder .. '"</b></p>'
 		end
 	elseif (Request.PostParams["EnablePlugin"] ~= nil) then
 		if (EnablePlugin(SettingsIni, PluginFolder, EnabledPlugins)) then
-			return '<p style="color: green;"><b>You enabled plugin: "' .. PluginFolder .. '"</b></p>'
+			return '<p style="color: green;"><b>已启用: "' .. PluginFolder .. '"</b></p>'
 		end
 	elseif (Request.PostParams["MoveUp"] ~= nil) then
 		MovePlugin(SettingsIni, PluginFolder, -1, EnabledPlugins)
@@ -316,7 +316,7 @@ function HandleRequest_ManagePlugins(Request)
 
 	if (Request.PostParams["reload"] ~= nil) then
 		Content = Content .. "<head><meta http-equiv=\"refresh\" content=\"5;\"></head>"
-		Content = Content .. "<p>Reloading plugins... This can take a while depending on the plugins you're using.</p>"
+		Content = Content .. "<p>正在重载插件... 重载时间取决于服务器配置及插件数量</p>"
 		cRoot:Get():GetPluginManager():ReloadPlugins()
 		return Content
 	end
@@ -333,8 +333,8 @@ function HandleRequest_ManagePlugins(Request)
 		Content = Content .. [[
 			<form method='POST'>
 			<p class="warn"><b>
-			You need to reload the plugins in order for the changes to take effect.
-			&nbsp;<input type='submit' name='reload' value='Reload now!'>
+			重载插件后，更改才会生效
+			&nbsp;<input type='submit' name='reload' value='立即重载'>
 			</b></p></form>
 		]]
 	end
@@ -342,10 +342,10 @@ function HandleRequest_ManagePlugins(Request)
 	Content = Content .. ListCurrentPlugins(EnabledPlugins)
 
 	Content = Content .. [[<hr />
-	<h4>Reload</h4>
+	<h4>重载</h4>
 	<form method='POST'>
-	<p>Click the reload button to reload all plugins.
-	<input type='submit' name='reload' value='Reload!'></p>
+	<p>重载所有插件
+	<input type='submit' name='reload' value='重载'></p>
 	</form>]]
 	return Content
 end

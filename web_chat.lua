@@ -202,7 +202,7 @@ function BindWebCommand(a_CommandString, a_HelpString, a_PluginName, a_CallbackN
 	-- Check if the command is already bound. Return false with an error message if.
 	for Idx, CommandInfo in ipairs(WebCommands) do
 		if (CommandInfo.Command == a_CommandString) then
-			return false, "That command is already bound to a plugin called \"" .. CommandInfo.PluginName .. "\"."
+			return false, "本指令已被名为 \"" .. CommandInfo.PluginName .. "\" 的插件绑定."
 		end
 	end
 
@@ -217,10 +217,10 @@ end
 
 -- Used by the webadmin to use /help
 function HandleWebHelpCommand(a_User, a_Message)
-	local Content = "Available Commands:"
+	local Content = "可用命令:"
 	for Idx, CommandInfo in ipairs(WebCommands) do
 		if (CommandInfo.HelpString ~= "") then
-			Content = Content .. '<br />' .. CommandInfo.CommandString .. '&ensp; - &ensp;' .. CommandInfo.HelpString
+			Content = Content .. ' ' .. CommandInfo.CommandString .. ' - ' .. CommandInfo.HelpString
 		end
 	end
 
@@ -235,7 +235,7 @@ end
 -- Used by the webadmin to reload the server
 function HandleWebReloadCommand(a_User, a_Message)
 	cPluginManager:Get():ReloadPlugins()
-	WEBLOG("Reloading Plugins", a_User)
+	WEBLOG("正在重新加载插件...", a_User)
 	return true
 end
 
@@ -244,8 +244,8 @@ end
 
 
 -- Register some basic commands
-BindWebCommand("/help", "Shows a list of all the possible commands", "Core", "HandleWebHelpCommand")
-BindWebCommand("/reload", "Reloads all the plugins", "Core", "HandleWebReloadCommand")
+BindWebCommand("/help", "列出所有可用的命令", "Core", "HandleWebHelpCommand")
+BindWebCommand("/reload", "重载所有插件", "Core", "HandleWebReloadCommand")
 
 
 
@@ -261,7 +261,7 @@ end
 
 
 function OnPlayerJoined_WebChat(Player)
-	WEBLOGINFO(Player:GetName() .. " has joined the game")
+	WEBLOGINFO(Player:GetName() .. " 加入了游戏")
 end
 
 
@@ -269,7 +269,7 @@ end
 
 
 function OnDisconnect(a_Player)
-	WEBLOGINFO(a_Player:GetName() .. " has left the game")
+	WEBLOGINFO(a_Player:GetName() .. " 离开了游戏")
 end
 
 
@@ -331,11 +331,11 @@ function HandleRequest_Chat( Request )
 				-- cPluginManager:CallPlugin doesn't support calling yourself, so we have to check if the command is from the Core.
 				if (CommandInfo.PluginName == "Core") then
 					if (not _G[CommandInfo.CallbackName](Request.Username, Request.PostParams["ChatMessage"])) then
-						WEBLOG("Something went wrong while calling \"" .. CommandInfo.CallbackName .. "\" From \"" .. CommandInfo.PluginName .. "\".", Request.Username)
+						WEBLOG("调用来自 \"" .. CommandInfo.PluginName .. "\" 的 \"" .. CommandInfo.CallbackName .. "\" 时出错", Request.Username)
 					end
 				else
 					if (not cPluginManager:CallPlugin(CommandInfo.PluginName, CommandInfo.CallbackName, Request.Username, Request.PostParams["ChatMessage"])) then
-						WEBLOG("Something went wrong while calling \"" .. CommandInfo.CallbackName .. "\" From \"" .. CommandInfo.PluginName .. "\".", Request.Username)
+						WEBLOG("调用来自 \"" .. CommandInfo.PluginName .. "\" 的 \"" .. CommandInfo.CallbackName .. "\" 时出错", Request.Username)
 					end
 				end
 				return ""
@@ -344,7 +344,7 @@ function HandleRequest_Chat( Request )
 
 		-- If the message starts with a '/' then the message is a command, but since it wasn't executed a few lines above the command didn't exist
 		if (Request.PostParams["ChatMessage"]:sub(1, 1) == "/") then
-			WEBLOG('Unknown Command "' .. Request.PostParams["ChatMessage"] .. '"', nil)
+			WEBLOG('未知的指令 ' .. Request.PostParams["ChatMessage"] .. '', nil)
 			return ""
 		end
 
@@ -364,7 +364,7 @@ function HandleRequest_Chat( Request )
 	local Content = JavaScript
 	Content = Content .. [[
 	<div style="font-family: Courier; border: 1px solid #DDD; padding: 10px; width: 97%; height: 400px; overflow: scroll;" id="ChatDiv"></div>
-	<input type="text" id="ChatMessage" onKeyPress="if (event.keyCode == 13) { SendChatMessage(); }"><input type="submit" value="Submit" onClick="SendChatMessage();">
+	<input type="text" id="ChatMessage" onKeyPress="if (event.keyCode == 13) { SendChatMessage(); }"><input type="submit" value="发送" onClick="SendChatMessage();">
 	]]
 	return Content
 end

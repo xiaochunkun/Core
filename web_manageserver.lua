@@ -12,19 +12,19 @@ function HandleRequest_ManageServer( Request )
 	Content = Content .. [[
 	<form method="POST">
 	<table>
-	<th colspan="2">Manage Server</th>
-	<tr><td><input type="submit" value="Restart Server" name="RestartServer">  restart the server</td></tr>
-	<tr><td><input type="submit" value="Reload Server" name="ReloadServer"> reload the server</td></tr>
-	<tr><td><input type="submit" value="Stop Server" name="StopServer"> stop the server</td></tr>
+	<th colspan="2">服务器管理</th>
+	<tr><td><input type="submit" value="重启" name="RestartServer"> 重启服务器</td></tr>
+	<tr><td><input type="submit" value="重载" name="ReloadServer"> 重载服务器插件</td></tr>
+	<tr><td><input type="submit" value="停止" name="StopServer"> 关闭服务器</td></tr>
 	</th>
 	</table>
 	<br />
 	<table>
-	<th colspan="2">Manage Worlds</th>
+	<th colspan="2">世界管理</th>
 	]]
 	local LoopWorlds = function( World )
 		Content = Content .. [[
-		<tr><td><input type="submit" value="]] .. World:GetName() .. [[" name="WorldSaveAllChunks"> Save all the chunks of world ]] .. World:GetName() .. [[</td></tr>
+		<tr><td><input type="submit" value="]] .. World:GetName() .. [[" name="WorldSaveAllChunks"> 保存 ]] .. World:GetName() .. [[ 世界</td></tr>
 
 		]]
 	end

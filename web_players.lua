@@ -74,11 +74,11 @@ local function GetPlayerRow(a_Player)
 		PlayerUUID = a_Player.PlayerUUID,
 	}
 	ins(Row, "<td><form method='GET' style='float: left'>")
-	ins(Row, GetFormButton("details", "View details", PlayerIdent))
+	ins(Row, GetFormButton("details", "查看信息", PlayerIdent))
 	ins(Row, "</form> <form method='GET' style='float: left'>")
-	ins(Row, GetFormButton("sendpm", "Send PM", PlayerIdent))
+	ins(Row, GetFormButton("sendpm", "发送私信", PlayerIdent))
 	ins(Row, "</form> <form method='POST' style='float: left'>")
-	ins(Row, GetFormButton("kick", "Kick", PlayerIdent))
+	ins(Row, GetFormButton("kick", "踢出", PlayerIdent))
 	ins(Row, "</form></td>")
 	
 	-- Finish the row:
@@ -96,7 +96,7 @@ local function GetPositionDetails(a_PlayerIdent)
 	local PlayerInfo = {}
 	local World = cRoot:Get():GetWorld(a_PlayerIdent.WorldName)
 	if (World == nil) then
-		return HTMLError("Error querying player position details - no world.")
+		return HTMLError("无法查询位置信息：世界错误")
 	end
 	World:DoWithEntityByID(a_PlayerIdent.EntityID,
 		function(a_Entity)
@@ -119,15 +119,15 @@ local function GetPositionDetails(a_PlayerIdent)
 	-- Display the current world and coords:
 	local Page =
 	{
-		"<table><tr><th>Current world</th><td>",
+		"<table><tr><th>当前世界</th><td>",
 		cWebAdmin:GetHTMLEscapedString(a_PlayerIdent.WorldName),
-		"</td></tr><tr><th>Position</th><td>X: ",
+		"</td></tr><tr><th>位置</th><td>X: ",
 		tostring(math.floor(PlayerInfo.Pos.x * 1000) / 1000),
 		"<br/>Y: ",
 		tostring(math.floor(PlayerInfo.Pos.y * 1000) / 1000),
 		"<br/>Z: ",
 		tostring(math.floor(PlayerInfo.Pos.z * 1000) / 1000),
-		"</td></tr><tr><th>Last bed position</th><td>X: ",
+		"</td></tr><tr><th>复活点位置</th><td>X: ",
 		tostring(PlayerInfo.LastBedPos.x),
 		"<br/>Y: ",
 		tostring(PlayerInfo.LastBedPos.y),
@@ -161,15 +161,15 @@ local function GetRankDetails(a_PlayerIdent)
 	table.sort(Permissions)
 	local Page =
 	{
-		"<h4>Rank</h4><table><tr><th>Current rank</th><td>",
+		"<h4>权限</h4><table><tr><th>当前权限组</th><td>",
 		RankName,
-		"</td></tr><tr><th>Permissions</th><td>",
+		"</td></tr><tr><th>权限</th><td>",
 		con(Permissions, "<br/>"),
 		"</td></tr>",
 	}
 		
 	-- Let the admin change the rank using a combobox:
-	ins(Page, "<tr><th>Change rank</th><td><form method='POST'><select name='RankName'>")
+	ins(Page, "<tr><th>更改权限</th><td><form method='POST'><select name='RankName'>")
 	local AllRanks = cRankManager:GetAllRanks()
 	table.sort(AllRanks)
 	for _, rank in ipairs(AllRanks) do
@@ -185,7 +185,7 @@ local function GetRankDetails(a_PlayerIdent)
 		ins(Page, "</option>")
 	end
 	ins(Page, "</select>")
-	ins(Page, GetFormButton("setrank", "Change rank", a_PlayerIdent))
+	ins(Page, GetFormButton("setrank", "更改", a_PlayerIdent))
 	ins(Page, "</form></td></tr></table>")
 	
 	return con(Page)
@@ -224,7 +224,7 @@ local function ShowMainPlayersPage(a_Request)
 	for _, worldname in ipairs(WorldNames) do
 		ins(Page, "<h4>")
 		ins(Page, worldname)
-		ins(Page, "</h4><table><tr><th>Player</th><th>Rank</th><th>Actions</th></tr>")
+		ins(Page, "</h4><table><tr><th>玩家</th><th>权限</th><th>操作</th></tr>")
 		table.sort(PerWorldPlayers[worldname],
 			function (a_Player1, a_Player2)
 				return (a_Player1.PlayerName < a_Player2.PlayerName)
@@ -233,7 +233,7 @@ local function ShowMainPlayersPage(a_Request)
 		for _, player in ipairs(PerWorldPlayers[worldname]) do
 			ins(Page, GetPlayerRow(player))
 		end
-		ins(Page, "</table><p>Total players in world: ")
+		ins(Page, "</table><p>世界总玩家数: ")
 		ins(Page, tostring(#PerWorldPlayers[worldname]))
 		ins(Page, "</p>")
 	end
@@ -253,7 +253,7 @@ local function ShowDetailsPage(a_Request)
 	local PlayerName = a_Request.PostParams["PlayerName"]
 	local PlayerUUID = a_Request.PostParams["PlayerUUID"]
 	if ((WorldName == nil) or (EntityID == nil) or (PlayerName == nil) or (PlayerUUID == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Stuff the parameters into a table:
@@ -268,9 +268,9 @@ local function ShowDetailsPage(a_Request)
 	-- Add the header:
 	local Page =
 	{
-		"<p>Back to <a href='/",
+		"<p>返回 <a href='/",
 		a_Request.Path,
-		"'>player list</a>.</p>",
+		"'>玩家列表</a>.</p>",
 	}
 	
 	-- Display the position details:
@@ -294,13 +294,13 @@ local function ShowKickPlayerPage(a_Request)
 	local EntityID   = a_Request.PostParams["EntityID"]
 	local PlayerName = a_Request.PostParams["PlayerName"]
 	if ((WorldName == nil) or (EntityID == nil) or (PlayerName == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Get the world:
 	local World = cRoot:Get():GetWorld(WorldName)
 	if (World == nil) then
-		return HTMLError("Bad request, no such world.")
+		return HTMLError("请求错误：不存在的世界")
 	end
 	
 	-- Kick the player:
@@ -309,7 +309,7 @@ local function ShowKickPlayerPage(a_Request)
 			if (a_Entity:IsPlayer()) then
 				local Client = tolua.cast(a_Entity, "cPlayer"):GetClientHandle()
 				if (Client ~= nil) then
-					Client:Kick(a_Request.PostParams["Reason"] or "Kicked from webadmin")
+					Client:Kick(a_Request.PostParams["Reason"] or "被 Web 管理员踢出")
 				else
 					LOG("Client is nil")
 				end
@@ -318,7 +318,7 @@ local function ShowKickPlayerPage(a_Request)
 	)
 	
 	-- Redirect the admin back to the player list:
-	return "<p>Player kicked. <a href='/" .. a_Request.Path .. "'>Return to player list</a>.</p>"
+	return "<p>已踢出玩家 <a href='/" .. a_Request.Path .. "'>返回玩家列表</a>.</p>"
 end
 
 
@@ -332,7 +332,7 @@ local function ShowSendPMPage(a_Request)
 	local EntityID   = a_Request.PostParams["EntityID"]
 	local PlayerName = a_Request.PostParams["PlayerName"]
 	if ((WorldName == nil) or (EntityID == nil) or (PlayerName == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Show the form for entering the message:
@@ -343,11 +343,11 @@ local function ShowSendPMPage(a_Request)
 		EntityID   = EntityID,
 	}
 	return table.concat({
-		"<h4>Send a message</h4><table><tr><th>Player</th><td>",
+		"<h4>私信</h4><table><tr><th>玩家</th><td>",
 		cWebAdmin:GetHTMLEscapedString(PlayerName),
-		"</td></tr><tr><th>Message</th><td><form method='POST'><input type='text' name='Msg' size=50/>",
+		"</td></tr><tr><th>信息</th><td><form method='POST'><input type='text' name='Msg' size=50/>",
 		"</td></tr><tr><th/><td>",
-		GetFormButton("sendpmproc", "Send message", PlayerIdent),
+		GetFormButton("sendpmproc", "发送", PlayerIdent),
 		"</td></tr></table>"
 	})
 end
@@ -365,7 +365,7 @@ local function ShowSendPMProcPage(a_Request)
 	local PlayerName = a_Request.PostParams["PlayerName"]
 	local Msg        = a_Request.PostParams["Msg"]
 	if ((WorldName == nil) or (EntityID == nil) or (PlayerName == nil) or (Msg == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Send the PM:
@@ -381,7 +381,7 @@ local function ShowSendPMProcPage(a_Request)
 	end
 	
 	-- Redirect the admin back to the player list:
-	return "<p>Message sent. <a href='/" .. a_Request.Path .. "'>Return to player list</a>.</p>"
+	return "<p>信息已发送 <a href='/" .. a_Request.Path .. "'>返回玩家列表</a>.</p>"
 end
 
 
@@ -398,7 +398,7 @@ local function ShowSetRankPage(a_Request)
 	local PlayerUUID = a_Request.PostParams["PlayerUUID"]
 	local RankName   = a_Request.PostParams["RankName"]
 	if ((WorldName == nil) or (EntityID == nil) or (PlayerName == nil) or (PlayerUUID == nil) or (RankName == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Change the player's rank:
@@ -408,7 +408,7 @@ local function ShowSetRankPage(a_Request)
 	cRoot:Get():ForEachPlayer(
 		function(a_CBPlayer)
 			if (a_CBPlayer:GetName() == PlayerName) then
-				a_CBPlayer:SendMessage("You were assigned the rank " .. RankName .. " by webadmin.")
+				a_CBPlayer:SendMessage("你已被 Web 管理员移至 " .. RankName .. " 权限组！")
 				a_CBPlayer:LoadRank()
 			end
 		end
@@ -416,7 +416,7 @@ local function ShowSetRankPage(a_Request)
 	
 	-- Redirect the admin back to the player list:
 	return con({
-		"<p>Rank changed. <a href='/",
+		"<p>已更改权限 <a href='/",
 		a_Request.Path,
 		"?subpage=details&PlayerName=",
 		cWebAdmin:GetHTMLEscapedString(PlayerName),
@@ -426,7 +426,7 @@ local function ShowSetRankPage(a_Request)
 		cWebAdmin:GetHTMLEscapedString(WorldName),
 		"&EntityID=",
 		cWebAdmin:GetHTMLEscapedString(EntityID),
-		"'>Return to player details</a>.</p>"
+		"'>返回玩家信息</a>.</p>"
 	})
 end
 
@@ -456,7 +456,7 @@ function HandleRequest_Players(a_Request)
 	local Subpage = (a_Request.PostParams["subpage"] or "")
 	local Handler = g_SubpageHandlers[Subpage]
 	if (Handler == nil) then
-		return HTMLError("An internal error has occurred, no handler for subpage " .. Subpage .. ".")
+		return HTMLError("服务器内部错误，无法处理子页面 " .. Subpage .. ".")
 	end
 	
 	local PageContent = Handler(a_Request)

@@ -53,7 +53,7 @@ local function ColorCodeToHTML(a_ColorCode)
 
 	-- Check if the color code is valid:
 	if (ColorCodeDef == nil) then
-		return "<b><i>Unknown color code</i></b>"
+		return "<b><i>未知颜色代码</i></b>"
 	end
 
 	-- If the code has special HTML, use that instead:
@@ -158,20 +158,20 @@ local function GetRankRow(a_RankName)
 
 	-- Display the visuals:
 	local MsgPrefix, MsgSuffix, MsgNameColorCode = cRankManager:GetRankVisuals(a_RankName)
-	ins(Row, "Message prefix: ")
+	ins(Row, "消息前缀: ")
 	ins(Row, MsgPrefix)
-	ins(Row, "<br/>Message suffix: ")
+	ins(Row, "<br/>消息后缀: ")
 	ins(Row, MsgSuffix)
-	ins(Row, "<br/>Name color: ")
+	ins(Row, "<br/>名称颜色: ")
 	ins(Row, ColorCodeToHTML(MsgNameColorCode))
 
 	-- Display actions for this rank:
 	ins(Row, "</td><td><form>")
-	ins(Row, GetFormButton("editgroups", "Edit groups", {RankName = a_RankName}))
+	ins(Row, GetFormButton("editgroups", "编辑权限组", {RankName = a_RankName}))
 	ins(Row, "</form><form>")
-	ins(Row, GetFormButton("editvisuals", "Edit visuals", {RankName = a_RankName}))
+	ins(Row, GetFormButton("editvisuals", "编辑视觉效果", {RankName = a_RankName}))
 	ins(Row, "</form><form>")
-	ins(Row, GetFormButton("confirmdel", "Delete rank", {RankName = a_RankName}))
+	ins(Row, GetFormButton("confirmdel", "删除阶级", {RankName = a_RankName}))
 
 	-- Terminate the row and return the entire concatenated string:
 	ins(Row, "</form></td></tr>")
@@ -188,10 +188,10 @@ local function ShowMainRanksPage(a_Request)
 	local Page = {}
 
 	-- Add the rank control header:
-	ins(Page, "<p><a href='?subpage=addrank'>Add a new rank</a></p>")
+	ins(Page, "<p><a href='?subpage=addrank'>添加新阶级</a></p>")
 
 	-- Add a table describing each rank:
-	ins(Page, "<table><tr><th>Rank</th><th>Groups</th><th>Visuals</th><th>Action</th></tr>\n")
+	ins(Page, "<table><tr><th>阶级</th><th>权限组</th><th>视觉效果</th><th>操作</th></tr>\n")
 	local AllRanks = cRankManager:GetAllRanks()
 	table.sort(AllRanks)
 	for _, rank in ipairs(AllRanks) do
@@ -203,9 +203,9 @@ local function ShowMainRanksPage(a_Request)
 	--ins(Page, "<table><tr><th>Default rank</th><td>")
 	--ins(Page, GetRankList(cRankManager:GetDefaultRank()))
 	--ins(Page, "</td><td><input type='submit' name='EditDefaultRank' value='Edit' /></td></tr></table>")
-	ins(Page, "<form method='POST'><b>Default rank:</b> ")
+	ins(Page, "<form method='POST'><b>默认阶级:</b> ")
 	ins(Page, GetRankList(cRankManager:GetDefaultRank()))
-	ins(Page, "<input type='submit' name='EditDefaultRank' value='Set' />")
+	ins(Page, "<input type='submit' name='EditDefaultRank' value='设置' />")
 	ins(Page, "<input type='hidden' name='subpage' value='editdefaultrank' /></form>")
 
 	-- Return the entire concatenated string:
@@ -222,7 +222,7 @@ local function ShowAddGroupPage(a_Request)
 	local RankName = a_Request.PostParams["RankName"]
 	local NewGroupName = a_Request.PostParams["NewGroupName"]
 	if ((RankName == nil) or (NewGroupName == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求出错")
 	end
 
 	-- Add the group:
@@ -230,11 +230,11 @@ local function ShowAddGroupPage(a_Request)
 
 	-- Redirect the player:
 	return
-		"<p>Group added. <a href='/" ..
+		"<p>已添加权限组 <a href='/" ..
 		a_Request.Path ..
 		"?subpage=editgroups&RankName=" ..
 		cUrlParser:UrlEncode(RankName) ..
-		"'>Return to list</a>."
+		"'>返回</a>"
 end
 
 
@@ -247,7 +247,7 @@ local function ShowRemoveGroupPage(a_Request)
 	local RankName = a_Request.PostParams["RankName"]
 	local GroupName = a_Request.PostParams["GroupName"]
 	if ((RankName == nil) or (GroupName == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求出错")
 	end
 
 	-- Remove the group:
@@ -255,11 +255,11 @@ local function ShowRemoveGroupPage(a_Request)
 
 	-- Redirect the user:
 	return
-		"<p>Group removed. <a href='/" ..
+		"<p>已删除权限组 <a href='/" ..
 		a_Request.Path ..
 		"?subpage=editgroups&RankName=" ..
 		cUrlParser:UrlEncode(RankName) ..
-		"'>Return to list</a>."
+		"'>返回</a>."
 end
 
 
@@ -276,20 +276,20 @@ local function ShowAddRankPage(a_Request)
 		<input type='hidden' name='subpage' value='addrankproc'/>
 		<table>
 			<tr>
-				<th>Rank name:</th>
+				<th>阶级名称:</th>
 				<td><input type="text" name="RankName"/></td>
 			</tr><tr>
-				<th>Message prefix:</th>
+				<th>消息前缀:</th>
 				<td><input type="text" name="MsgPrefix"/></td>
 			</tr><tr>
-				<th>Message suffix:</th>
+				<th>消息后缀:</th>
 				<td><input type="text" name="MsgSuffix"/></td>
 			</tr><tr>
-				<th>Message name color:</th>
+				<th>名称颜色:</th>
 				<td><input type="text" name="MsgNameColorCode"/></td>
 			</tr><tr>
 				<td/>
-				<td><input type="submit" name="AddRank" value="Add rank"/></td>
+				<td><input type="submit" name="AddRank" value="添加"/></td>
 			</tr>
 		</table></form>
 	]]
@@ -307,12 +307,12 @@ local function ShowAddRankProcessPage(a_Request)
 	local MsgSuffix        = a_Request.PostParams["MsgSuffix"]
 	local MsgNameColorCode = a_Request.PostParams["MsgNameColorCode"]
 	if ((RankName == nil) or (MsgPrefix == nil) or (MsgSuffix == nil) or (MsgNameColorCode == nil)) then
-		return HTMLError("Invalid request received, missing values.")
+		return HTMLError("请求出错")
 	end
 
 	-- Add the new rank:
 	cRankManager:AddRank(RankName, MsgPrefix, MsgSuffix, MsgNameColorCode)
-	return "<p>Rank created. <a href='/" .. a_Request.Path .. "'>Return</a>.</p>"
+	return "<p>已创建阶级 <a href='/" .. a_Request.Path .. "'>返回</a></p>"
 end
 
 
@@ -329,10 +329,10 @@ local function ShowConfirmDelPage(a_Request)
 
 	-- Show confirmation:
 	return [[
-		<h4>Delete rank</h4>
-		<p>Are you sure you want to delete rank ]] .. RankName .. [[?</p>
-		<p><a href='?subpage=del&RankName=]] .. RankName .. [['>Delete</a></p>
-		<p><a href='/]] .. a_Request.Path .. [['>Cancel</a></p>
+		<h4>删除阶级</h4>
+		<p>您确认要删除阶级 ]] .. RankName .. [[ 吗?</p>
+		<p><a href='?subpage=del&RankName=]] .. RankName .. [['>删除</a></p>
+		<p><a href='/]] .. a_Request.Path .. [['>取消</a></p>
 	]]
 end
 
@@ -345,14 +345,14 @@ local function ShowDelPage(a_Request)
 	-- Check the input:
 	local RankName = a_Request.PostParams["RankName"]
 	if (RankName == nil) then
-		return HTMLError("Bad request")
+		return HTMLError("请求出错")
 	end
 
 	-- Delete the rank:
 	cRankManager:RemoveRank(RankName)
 
 	-- Redirect back to list:
-	return "<p>Rank deleted. <a href='/" .. a_Request.Path .. "'>Return to list</a>."
+	return "<p>阶级已删除 <a href='/" .. a_Request.Path .. "'>返回</a>"
 end
 
 
@@ -365,14 +365,14 @@ local function ShowEditDefaultRankPage(a_Request)
 	-- Check the input:
 	local RankName = a_Request.PostParams["NewGroupName"]
 	if ((RankName == nil) or (RankName == "")) then
-		return HTMLError("Bad request")
+		return HTMLError("请求出错")
 	end
 
 	-- Change the default rank:
 	if (cRankManager:SetDefaultRank(RankName)) then
-		return "<p>Default rank changed to " .. RankName .. "! <a href='/" .. a_Request.Path .. "'>Return to list</a></p>"
+		return "<p>已将默认阶级更改为 " .. RankName .. "! <a href='/" .. a_Request.Path .. "'>返回</a></p>"
 	else
-		return "<p>Operation failed! <a href='/" .. a_Request.Path .. "'>Return to list</a></p>"
+		return "<p>操作失败! <a href='/" .. a_Request.Path .. "'>返回</a></p>"
 	end
 end
 
@@ -385,23 +385,23 @@ local function ShowEditGroupsPage(a_Request)
 	-- Check the input:
 	local RankName = a_Request.PostParams["RankName"]
 	if (RankName == nil) then
-		return HTMLError("Bad request")
+		return HTMLError("请求出错")
 	end
 
 	-- Add header:
 	local Page = {[[
-		<p><a href='/]] .. a_Request.Path .. [['/>Back to rank list.</a></p>
-		<h4>Add a group</h4>
+		<p><a href='/]] .. a_Request.Path .. [['/>返回</a></p>
+		<h4>添加权限组</h4>
 		<form method='POST'>
 		<input type='hidden' name='subpage' value='addgroup'/>
 		<table>
 			<tr>
-				<th>Group:</th>
+				<th>权限组:</th>
 				<td>]] .. GetGroupList("") .. [[</td>
 			</tr>
 			<tr>
 				<td/>
-				<td><input type='submit' value='Add group'/></td>
+				<td><input type='submit' value='添加'/></td>
 			</tr>
 		</table>
 		<input type='hidden' name='RankName' value=']]
@@ -412,10 +412,10 @@ local function ShowEditGroupsPage(a_Request)
 	-- List all the groups in the rank:
 	local Groups = cRankManager:GetRankGroups(RankName)
 	table.sort(Groups)
-	ins(Page, "<h4>Groups in rank ")
+	ins(Page, "<h4>阶级 ")
 	ins(Page, cWebAdmin:GetHTMLEscapedString(RankName))
-	ins(Page, "</h4>")
-	ins(Page, "<table><tr><th>Group</th><th>Action</th></tr>")
+	ins(Page, " 的权限组</h4>")
+	ins(Page, "<table><tr><th>权限组</th><th>操作</th></tr>")
 	for _, Group in ipairs(Groups) do
 		ins(Page, "<tr><td>")
 		ins(Page, Group)
@@ -423,7 +423,7 @@ local function ShowEditGroupsPage(a_Request)
 		ins(Page, RankName)
 		ins(Page, "'/><input type='hidden' name='GroupName' value='")
 		ins(Page, Group)
-		ins(Page, "'/><input type='submit' value='Remove'/>")
+		ins(Page, "'/><input type='submit' value='删除'/>")
 		ins(Page, "<input type='hidden' name='subpage' value='removegroup'/></form></td></tr>")
 	end
 	ins(Page, "</table>")
@@ -440,26 +440,26 @@ local function ShowEditVisualsPage(a_Request)
 	-- Check params:
 	local RankName = a_Request.PostParams["RankName"]
 	if (RankName == nil) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求出错")
 	end
 
 	-- Get the current visuals to fill in:
 	local MsgPrefix, MsgSuffix, MsgNameColorCode = cRankManager:GetRankVisuals(RankName)
 	if (MsgPrefix == nil) then
-		return HTMLError("Bad request, no such rank.")
+		return HTMLError("操作失败：阶级不存在")
 	end
 
 	-- Insert the form for changing the values:
-	local Page = {"<h4>Edit rank visuals - "}
+	local Page = {"<h4>编辑视觉效果 - "}
 	ins(Page, cWebAdmin:GetHTMLEscapedString(RankName))
-	ins(Page, "</h4><form method='POST'><table><tr><th>Message prefix:</th><td><input type='text' name='MsgPrefix' value='")
+	ins(Page, "</h4><form method='POST'><table><tr><th>消息前缀:</th><td><input type='text' name='MsgPrefix' value='")
 	ins(Page, cWebAdmin:GetHTMLEscapedString(MsgPrefix))
-	ins(Page, "'/></td></tr><tr><th>Message suffix:</th><td><input type='text' name='MsgSuffix' value='")
+	ins(Page, "'/></td></tr><tr><th>消息后缀:</th><td><input type='text' name='MsgSuffix' value='")
 	ins(Page, cWebAdmin:GetHTMLEscapedString(MsgSuffix))
-	ins(Page, "'/></td></tr><tr><th>Message name color code:</th><td><input type='text' name='MsgNameColorCode' value='")
+	ins(Page, "'/></td></tr><tr><th>名称颜色:</th><td><input type='text' name='MsgNameColorCode' value='")
 	ins(Page, cWebAdmin:GetHTMLEscapedString(MsgNameColorCode))
 	ins(Page, "'/></td></tr><tr><th/><td>")
-	ins(Page, GetFormButton("savevisuals", "Save visuals", {RankName = RankName}))
+	ins(Page, GetFormButton("savevisuals", "保存", {RankName = RankName}))
 	ins(Page, "</td></tr></table></form>")
 
 	return con(Page)
@@ -477,16 +477,16 @@ local function ShowSaveVisualsPage(a_Request)
 	local MsgSuffix        = a_Request.PostParams["MsgSuffix"]
 	local MsgNameColorCode = a_Request.PostParams["MsgNameColorCode"]
 	if ((RankName == nil) or (MsgPrefix == nil) or (MsgSuffix == nil) or (MsgNameColorCode == nil)) then
-		return HTMLError("Invalid request received, missing values.")
+		return HTMLError("请求出错")
 	end
 
 	if (not g_ColorCodeDef[MsgNameColorCode]) then
-		return HTMLError("Invalid color code.")
+		return HTMLError("无效的颜色代码")
 	end
 	-- Save the visuals:
 	cRankManager:SetRankVisuals(RankName, MsgPrefix, MsgSuffix, MsgNameColorCode)
 
-	return "<p>Rank visuals saved. <a href='/" .. a_Request.Path .. "'>Return to rank list</a>."
+	return "<p>视觉效果已保存 <a href='/" .. a_Request.Path .. "'>返回</a>"
 end
 
 
@@ -520,7 +520,7 @@ function HandleRequest_Ranks(a_Request)
 	local Subpage = (a_Request.PostParams["subpage"] or "")
 	local Handler = g_SubpageHandlers[Subpage]
 	if (Handler == nil) then
-		return HTMLError("An internal error has occurred, no handler for subpage " .. Subpage .. ".")
+		return HTMLError("服务器内部错误，无法处理子页面 " .. Subpage .. ".")
 	end
 
 	local PageContent = Handler(a_Request)

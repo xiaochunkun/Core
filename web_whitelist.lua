@@ -51,7 +51,7 @@ local function getPlayerRow(a_Player)
 	ins(res, "</td><td>")
 	ins(res, cWebAdmin:GetHTMLEscapedString(a_Player.WhitelistedBy or "<unknown>"))
 	ins(res, "</td><td>")
-	ins(res, getPlayerActionButton("delplayer", "Remove", a_Player))
+	ins(res, getPlayerActionButton("delplayer", "移除", a_Player))
 	ins(res, "</td></tr>")
 	return con(res)
 end
@@ -65,23 +65,23 @@ local function showList(a_Request)
 	-- Show the whitelist status - enabled or disabled:
 	local res = { "<table><tr><td>" }
 	if (IsWhitelistEnabled()) then
-		ins(res, "Whitelist is <b>ENABLED</b></td><td colspan=3><form method='POST'><input type='hidden' name='action' value='disable'/><input type='submit' value='Disable'/>")
+		ins(res, "白名单已 <b>启用</b></td><td colspan=3><form method='POST'><input type='hidden' name='action' value='disable'/><input type='submit' value='禁用'/>")
 	else
-		ins(res, "Whitelist is <b>DISABLED</b></td><td colspan=3><form method='POST'><input type='hidden' name='action' value='enable'/><input type='submit' value='Enable'/>")
+		ins(res, "白名单已 <b>禁用</b></td><td colspan=3><form method='POST'><input type='hidden' name='action' value='enable'/><input type='submit' value='启用'/>")
 	end
 	ins(res, "</form></td></tr><tr><td colspan=4><hr/><br/></td></tr>")
 	
 	-- Add the form to whitelist players:
-	ins(res, "<tr><td colspan=4>Add player to whitelist: ")
-	ins(res, "<form method='POST'><input type='hidden' name='action' value='addplayer'/><input type='text' name='playername' value='' hint='Player name'/>")
-	ins(res, "<input type='submit' value='Add'/></form></td></tr><tr><td colspan=4><hr/><br/></td></tr>")
+	ins(res, "<tr><td colspan=4>将玩家添加到白名单: ")
+	ins(res, "<form method='POST'><input type='hidden' name='action' value='addplayer'/><input type='text' name='playername' value='' hint='玩家名'/>")
+	ins(res, "<input type='submit' value='添加'/></form></td></tr><tr><td colspan=4><hr/><br/></td></tr>")
 	
 	-- Show the whitelisted players:
 	local players = ListWhitelistedPlayers()
 	if (players[1] == nil) then
-		ins(res, "<tr><td colspan=4>There are no players in the whitelist.</td></tr>")
+		ins(res, "<tr><td colspan=4>白名单内没有玩家</td></tr>")
 	else
-		ins(res, "<tr><th>Name</th><th>Date whitelisted</th><th>Whitelisted by</th><th>Action</th></tr>")
+		ins(res, "<tr><th>名称</th><th>加入时间</th><th>操作员</th><th>操作</th></tr>")
 		for _, player in ipairs(players) do
 			ins(res, getPlayerRow(player))
 		end
@@ -100,7 +100,7 @@ local function showAddPlayer(a_Request)
 	-- Check HTML params:
 	local playerName = a_Request.PostParams["playername"] or ""
 	if (playerName == "") then
-		return HTMLError("Cannot add player, bad name") .. showList(a_Request)
+		return HTMLError("添加失败：非法的名称") .. showList(a_Request)
 	end
 	
 	-- Whitelist the player:

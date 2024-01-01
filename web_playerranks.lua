@@ -80,9 +80,9 @@ local function GetPlayerRow(a_PlayerUUID)
 
 	-- Display actions for this player:
 	ins(Row, "</td><td><form style='float: left'>")
-	ins(Row, GetFormButton("editplayer", "Edit", {PlayerUUID = a_PlayerUUID}))
+	ins(Row, GetFormButton("editplayer", "编辑", {PlayerUUID = a_PlayerUUID}))
 	ins(Row, "</form><form style='float: left'>")
-	ins(Row, GetFormButton("confirmdel", "Remove rank", {PlayerUUID = a_PlayerUUID, PlayerName = PlayerName}))
+	ins(Row, GetFormButton("confirmdel", "移除权限", {PlayerUUID = a_PlayerUUID, PlayerName = PlayerName}))
 
 	-- Terminate the row and return the entire concatenated string:
 	ins(Row, "</form></td></tr>")
@@ -105,10 +105,10 @@ local function ShowMainPlayersPage(a_Request)
 
 	-- Accumulator for the page data
 	local PageText = {}
-	ins(PageText, "<p><a href='?subpage=addplayer'>Add a new player</a>, <a href='?subpage=confirmclear'>Clear players</a></p>")
+	ins(PageText, "<p><a href='?subpage=addplayer'>创建玩家</a>, <a href='?subpage=confirmclear'>清除玩家</a></p>")
 
 	-- Add a table describing each player:
-	ins(PageText, "<table><tr><th>Playername</th><th>Rank</th><th>Action</th></tr>\n")
+	ins(PageText, "<table><tr><th>玩家</th><th>权限</th><th>操作</th></tr>\n")
 	local AllPlayers = cRankManager:GetAllPlayerUUIDs()
 	for i = StartRow, EndRow, 1 do
 		local PlayerUUID = AllPlayers[i + 1]
@@ -147,28 +147,28 @@ end
 --- Returns the HTML contents of the player add page
 local function ShowAddPlayerPage(a_Request)
 	return [[
-		<h4>Add Player</h4>
+		<h4>创建玩家</h4>
 		<form method="POST">
 		<input type="hidden" name="subpage" value="addplayerproc" />
 		<table>
 			<tr>
-				<th>Player Name:</th>
+				<th>玩家名:</th>
 				<td><input type="text" name="PlayerName" maxlength="16" /></td>
 			</tr>
 			<tr>
-				<th>Player UUID (short):</th>
+				<th>玩家 UUID (短UUID):</th>
 				<td>
 					<input type="text" name="PlayerUUID" maxlength="32" />
-					If you leave this empty, the server will generate the UUID automatically.
+					若此处留空，则由服务器自动生成随机 UUID
 				</td>
 			</tr>
 			<tr>
-				<th>Rank</th>
+				<th>权限</th>
 				<td>]] .. GetRankList(cRankManager:GetDefaultRank()) .. [[</td>
 			</tr>
 			<tr>
 				<td />
-				<td><input type="submit" name="AddPlayer" value="Add Player" /></td>
+				<td><input type="submit" name="AddPlayer" value="创建" /></td>
 			</tr>
 		</table>
 	</form>]]
@@ -185,15 +185,15 @@ local function ShowAddPlayerProcessPage(a_Request)
 	local PlayerUUID = a_Request.PostParams["PlayerUUID"]
 	local RankName   = a_Request.PostParams["RankName"]
 	if ((PlayerName == nil) or (PlayerUUID == nil) or (RankName == nil) or (RankName == "")) then
-		return HTMLError("Invalid request received, missing values.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 
 	-- Check if playername is given
 	if (PlayerName == "") then
 		return [[
-			<h4>Add Player</h4>
-			<p>Missing Playername or name is longer than 16 chars!</p>
-			<p><a href="?subpage=addplayer">Go back</a></p>
+			<h4>创建玩家</h4>
+			<p>未填写玩家名，或玩家名超过16个字符！</p>
+			<p><a href="?subpage=addplayer">返回</a></p>
 		]]
 	end
 
@@ -210,15 +210,15 @@ local function ShowAddPlayerProcessPage(a_Request)
 	if ((PlayerUUID == "") or (string.len(PlayerUUID) ~= 32)) then
 		if (a_Request.PostParams["PlayerUUID"] == "") then
 			return [[
-				<h4>Add Player</h4>
-				<p>Bad uuid. <a href="?subpage=addplayer">Go back</a></p>
+				<h4>创建玩家</h4>
+				<p>无效的 uuid. <a href="?subpage=addplayer">返回</a></p>
 			]]
 		else
 			return [[
-				<h4>Add Player</h4>
-				<p>UUID for player ]] .. PlayerName .. [[ not found!<br />
-				Maybe the player doesn't exists?</p>
-				<p><a href="?subpage=addplayer">Go back</a></p>
+				<h4>创建玩家</h4>
+				<p>无法找到玩家 ]] .. PlayerName .. [[ 的UUID!<br />
+				可能此玩家不存在?</p>
+				<p><a href="?subpage=addplayer">返回</a></p>
 			]]
 		end
 	end
@@ -226,16 +226,16 @@ local function ShowAddPlayerProcessPage(a_Request)
 	-- Exists the player already?
 	if (cRankManager:GetPlayerRankName(PlayerUUID) ~= "") then
 		return [[
-			<h4>Add Player</h4>
-			<p>Can't create the player because a player with the same uuid already exists!</p>
-			<p><a href="?subpage=addplayer">Go back</a></p>
+			<h4>创建玩家</h4>
+			<p>创建失败！原因：已存在相同的 UUID</p>
+			<p><a href="?subpage=addplayer">返回</a></p>
 		]]
 	end
 
 	-- Add the new player:
 	cRankManager:SetPlayerRank(PlayerUUID, PlayerName, RankName)
-	UpdateIngamePlayer(PlayerUUID, "You were assigned the rank " .. RankName .. " by webadmin.")
-	return "<p>Player created. <a href='/" .. a_Request.Path .. "'>Return</a>.</p>"
+	UpdateIngamePlayer(PlayerUUID, "你已被 Web 管理赋予 " .. RankName .. " 权限")
+	return "<p>已创建玩家 <a href='/" .. a_Request.Path .. "'>返回</a>.</p>"
 end
 
 
@@ -246,15 +246,15 @@ local function ShowDelPlayerPage(a_Request)
 	-- Check the input:
 	local PlayerUUID = a_Request.PostParams["PlayerUUID"]
 	if (PlayerUUID == nil) then
-		return HTMLError("Bad request")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 
 	-- Delete the player:
 	cRankManager:RemovePlayerRank(PlayerUUID)
-	UpdateIngamePlayer(PlayerUUID, "You were assigned the rank " .. cRankManager:GetDefaultRank() .. " by webadmin.")
+	UpdateIngamePlayer(PlayerUUID, "你已被 Web 管理赋予 " .. cRankManager:GetDefaultRank() .. " 权限")
 
 	-- Redirect back to list:
-	return "<p>Rank deleted. <a href='/" .. a_Request.Path .. "'>Return to list</a>."
+	return "<p>已删除权限 <a href='/" .. a_Request.Path .. "'>返回</a>."
 end
 
 
@@ -267,16 +267,16 @@ local function ShowConfirmDelPage(a_Request)
 	local PlayerUUID = a_Request.PostParams["PlayerUUID"]
 	local PlayerName = a_Request.PostParams["PlayerName"]
 	if ((PlayerUUID == nil) or (PlayerName == nil)) then
-		return HTMLError("Bad request")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 
 	-- Show confirmation:
 	return [[
-		<h4>Delete player</h4>
-		<p>Are you sure you want to delete player ]] .. PlayerName .. [[?<br />
+		<h4>删除玩家</h4>
+		<p>你确定要删除玩家 ]] .. PlayerName .. [[ 吗?<br />
 		<short>UUID: ]] .. PlayerUUID .. [[</short></p>
-		<p><a href='?subpage=delplayer&PlayerUUID=]] .. PlayerUUID .. [['>Delete</a></p>
-		<p><a href='/]] .. a_Request.Path .. [['>Cancel</a></p>
+		<p><a href='?subpage=delplayer&PlayerUUID=]] .. PlayerUUID .. [['>删除</a></p>
+		<p><a href='/]] .. a_Request.Path .. [['>取消</a></p>
 	]]
 end
 
@@ -289,7 +289,7 @@ local function ShowEditPlayerRankPage(a_Request)
 	-- Check the input:
 	local PlayerUUID = a_Request.PostParams["PlayerUUID"]
 	if ((PlayerUUID == nil) or (string.len(PlayerUUID) ~= 32)) then
-		return HTMLError("Bad request")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 
 	-- Get player name:
@@ -297,7 +297,7 @@ local function ShowEditPlayerRankPage(a_Request)
 	local PlayerRank = cRankManager:GetPlayerRankName(PlayerUUID)
 
 	return [[
-		<h4>Change rank from ]] .. PlayerName .. [[</h4>
+		<h4>修改玩家权限： ]] .. PlayerName .. [[</h4>
 		<form method="POST">
 		<input type="hidden" name="subpage" value="editplayerproc" />
 		<input type="hidden" name="PlayerUUID" value="]] .. PlayerUUID .. [[" />
@@ -307,16 +307,16 @@ local function ShowEditPlayerRankPage(a_Request)
 				<td>]] .. PlayerUUID .. [[</td>
 			</tr>
 			<tr>
-				<th>Current Rank</th>
+				<th>当前权限</th>
 				<td>]] .. PlayerRank .. [[</td>
 			</tr>
 			<tr>
-				<th>New Rank</th>
+				<th>新的权限</th>
 				<td>]] .. GetRankList(PlayerRank) .. [[</td>
 			</tr>
 			<tr>
 				<td />
-				<td><input type="submit" name="EditPlayerRank" value="Edit Rank" /></td>
+				<td><input type="submit" name="EditPlayerRank" value="修改" /></td>
 			</tr>
 		</table>
 		</form>
@@ -333,22 +333,22 @@ local function ShowEditPlayerRankProcessPage(a_Request)
 	local PlayerUUID = a_Request.PostParams["PlayerUUID"]
 	local NewRank    = a_Request.PostParams["RankName"]
 	if ((PlayerUUID == nil) or (NewRank == nil) or (string.len(PlayerUUID) ~= 32) or (NewRank == "")) then
-		return HTMLError("Bad request")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 
 	-- Get the player name:
 	local PlayerName = cRankManager:GetPlayerName(PlayerUUID)
 	if (PlayerName == "") then
 		return [[
-			<p>Can't change the rank because this user doesn't exists!</p>
-			<p><a href="/]] .. a_Request.Path .. [[">Go back</a></p>
+			<p>修改失败：玩家不存在！</p>
+			<p><a href="/]] .. a_Request.Path .. [[">返回</a></p>
 		]]
 	end
 
 	-- Edit the rank:
 	cRankManager:SetPlayerRank(PlayerUUID, PlayerName, NewRank)
-	UpdateIngamePlayer(PlayerUUID, "You were assigned the rank " .. NewRank .. " by webadmin.")
-	return "<p>The rank from player " .. PlayerName .. " was changed to " .. NewRank .. ". <a href='/" .. a_Request.Path .. "'>Return</a>.</p>"
+	UpdateIngamePlayer(PlayerUUID, "你已被 Web 管理赋予 " .. NewRank .. " 权限")
+	return "<p>玩家 " .. PlayerName .. " 已被更改至 " .. NewRank .. ". <a href='/" .. a_Request.Path .. "'>返回</a>.</p>"
 end
 
 
@@ -358,7 +358,7 @@ end
 --- Processes the clear of all player ranks
 local function ShowClearPlayersPage(a_Request)
 	cRankManager:ClearPlayerRanks()
-	LOGINFO("WebAdmin: A user cleared all player ranks")
+	LOGINFO("WebAdmin: 管理员清除了所有玩家的权限")
 
 	-- Update ingame players:
 	cRoot:Get():ForEachPlayer(
@@ -367,7 +367,7 @@ local function ShowClearPlayersPage(a_Request)
 		end
 	)
 
-	return "<p>Cleared all player ranks! <a href='/" .. a_Request.Path .. "'>Return</a>.</p>"
+	return "<p>已清除玩家权限！ <a href='/" .. a_Request.Path .. "'>返回</a>.</p>"
 end
 
 
@@ -378,10 +378,10 @@ end
 local function ShowConfirmClearPage(a_Request)
 	-- Show confirmation:
 	return [[
-		<h4>Clear all player ranks</h4>
-		<p>Are you sure you want to delete all players from the database?</p>
-		<p><a href='?subpage=clear'>Clear</a></p>
-		<p><a href='/]] .. a_Request.Path .. [['>Cancel</a></p>
+		<h4>清除所有玩家权限</h4>
+		<p>您确认要清空玩家权限数据库吗？</p>
+		<p><a href='?subpage=clear'>确认</a></p>
+		<p><a href='/]] .. a_Request.Path .. [['>取消</a></p>
 	]]
 end
 
@@ -414,7 +414,7 @@ function HandleRequest_PlayerRanks(a_Request)
 	local Subpage = (a_Request.PostParams["subpage"] or "")
 	local Handler = g_SubpageHandlers[Subpage]
 	if (Handler == nil) then
-		return HTMLError("An internal error has occurred, no handler for subpage " .. Subpage .. ".")
+		return HTMLError("服务器内部错误，无法处理子页面 " .. Subpage .. ".")
 	end
 
 	local PageContent = Handler(a_Request)

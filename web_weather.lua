@@ -1,13 +1,13 @@
 local function AddWorldButtons(inName)
 	result = "<form method='POST'><input type='hidden' name='WorldName' value='" .. inName .. "'>"
-	result = result .. "<input type='submit' name='SetTime' value='Dawn'>"
-	result = result .. "<input type='submit' name='SetTime' value='Day'>"
-	result = result .. "<input type='submit' name='SetTime' value='Dusk'>"
-	result = result .. "<input type='submit' name='SetTime' value='Night'>"
-	result = result .. "<input type='submit' name='SetTime' value='Midnight'>"
-	result = result .. "<input type='submit' name='SetWeather' value='Sun'>"
-	result = result .. "<input type='submit' name='SetWeather' value='Rain'>"
-	result = result .. "<input type='submit' name='SetWeather' value='Storm'></form>"
+	result = result .. "<input type='submit' name='SetTime' value='清晨'>"
+	result = result .. "<input type='submit' name='SetTime' value='正午'>"
+	result = result .. "<input type='submit' name='SetTime' value='黄昏'>"
+	result = result .. "<input type='submit' name='SetTime' value='夜晚'>"
+	result = result .. "<input type='submit' name='SetTime' value='午夜'>"
+	result = result .. "<input type='submit' name='SetWeather' value='晴朗'>"
+	result = result .. "<input type='submit' name='SetWeather' value='下雨'>"
+	result = result .. "<input type='submit' name='SetWeather' value='雷暴'></form>"
 	return result
 end
 
@@ -53,7 +53,7 @@ function HandleRequest_Weather(Request)
 end
 
 function GenerateContent()
-	local content = "<h4>Operations:</h4><br>"
+	local content = "<h4>操作:</h4><br>"
 	local worldCount = 0
 	local AddWorldToTable = function( inWorld )
 		worldCount = worldCount + 1
@@ -64,7 +64,7 @@ function GenerateContent()
 	content = content.."<table>"
 	cRoot:Get():ForEachWorld( AddWorldToTable )
 	if( worldCount == 0 ) then
-		content = content.."<tr><td>No worlds! O_O</td></tr>"
+		content = content.."<tr><td>不存在的世界! O_O</td></tr>"
 	end
 	content = content.."</table>"
 	

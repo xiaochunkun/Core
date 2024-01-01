@@ -54,9 +54,9 @@ local function GetGroupRow(a_GroupName)
 	
 	-- Fourth column: operations:
 	ins(Row, "<form>")
-	ins(Row, GetFormButton("edit", "Edit", {GroupName = a_GroupName}))
+	ins(Row, GetFormButton("edit", "编辑", {GroupName = a_GroupName}))
 	ins(Row, "</form></td><td width='1px' valign='top'><form>")
-	ins(Row, GetFormButton("confirmdelgroup", "Delete", {GroupName = a_GroupName}))
+	ins(Row, GetFormButton("confirmdelgroup", "删除", {GroupName = a_GroupName}))
 	ins(Row, "</form></td></tr>")
 
 	return con(Row)
@@ -68,15 +68,15 @@ end
 
 --- Displays the main Permissions page, listing the permission groups and their permissions
 local function ShowMainPermissionsPage(a_Request)
-	local Page = {"<h4>Create a new group</h4>"}
+	local Page = {"<h4>创建权限组</h4>"}
 	
 	-- Add the header for adding a new group:
-	ins(Page, "<form method='POST'><table><tr><td>Group name:</td><td width='1px'><input type='text' name='GroupName'/></td><td width='1px'>")
-	ins(Page, GetFormButton("addgroup", "Create a new group", {}))
+	ins(Page, "<form method='POST'><table><tr><td>组名称:</td><td width='1px'><input type='text' name='GroupName'/></td><td width='1px'>")
+	ins(Page, GetFormButton("addgroup", "创建", {}))
 	ins(Page, "</td><td width='50%'></td></tr></table></form><br/><br/>")
 	
 	-- Display a table showing all groups currently known:
-	ins(Page, "<h4>Groups</h4><table><tr><th>Group name</th><th>Permissions</th><th>Restrictions</th><th colspan=2>Actions</th></tr>")
+	ins(Page, "<h4>权限组</h4><table><tr><th>组名称</th><th>权限</th><th>限制</th><th colspan=2>操作</th></tr>")
 	local AllGroups = cRankManager:GetAllGroups()
 	table.sort(AllGroups)
 	for _, group in ipairs(AllGroups) do
@@ -97,14 +97,14 @@ local function ShowAddGroupPage(a_Request)
 	-- Check params:
 	local GroupName = a_Request.PostParams["GroupName"]
 	if (GroupName == nil) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Add the group:
 	cRankManager:AddGroup(TrimString(GroupName))
 	
 	-- Redirect the user:
-	return "<p>Group created. <a href='/" .. a_Request.Path .. "'>Return to group list</a>.</p>"
+	return "<p>权限组创建成功！ <a href='/" .. a_Request.Path .. "'>返回列表</a></p>"
 end
 
 
@@ -118,7 +118,7 @@ local function ShowAddPermissionPage(a_Request)
 	local GroupName = a_Request.PostParams["GroupName"]
 	local Permission = a_Request.PostParams["Permission"]
 	if ((GroupName == nil) or (Permission == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Add the permission:
@@ -126,11 +126,11 @@ local function ShowAddPermissionPage(a_Request)
 	
 	-- Redirect the user:
 	return
-		"<p>Permission added. <a href='/" ..
+		"<p>已添加权限。 <a href='/" ..
 		a_Request.Path ..
 		"?subpage=edit&GroupName=" ..
 		cWebAdmin:GetHTMLEscapedString(GroupName) ..
-		"'>Return to group list</a>.</p>"
+		"'>返回列表</a>.</p>"
 end
 
 
@@ -144,7 +144,7 @@ local function ShowAddRestrictionPage(a_Request)
 	local GroupName = a_Request.PostParams["GroupName"]
 	local Restriction = a_Request.PostParams["Restriction"]
 	if ((GroupName == nil) or (Restriction == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Add the permission:
@@ -152,11 +152,11 @@ local function ShowAddRestrictionPage(a_Request)
 	
 	-- Redirect the user:
 	return
-		"<p>Restriction added. <a href='/" ..
+		"<p>已添加限制。 <a href='/" ..
 		a_Request.Path ..
 		"?subpage=edit&GroupName=" ..
 		cWebAdmin:GetHTMLEscapedString(GroupName) ..
-		"'>Return to group details</a>.</p>"
+		"'>返回列表</a>.</p>"
 end
 
 
@@ -168,19 +168,19 @@ local function ShowConfirmDelGroupPage(a_Request)
 	-- Check params:
 	local GroupName = a_Request.PostParams["GroupName"]
 	if (GroupName == nil) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Show the confirmation request:
 	local Page =
 	{
-		"<h4>Delete group</h4><p>Are you sure you want to delete group ",
+		"<h4>删除权限组</h4><p>您确认要删除权限组 ",
 		GroupName,
-		"? It will be removed from all the ranks that are using it.</p>",
+		" 吗? 它将永远被移除（真的很久）！</p>",
 		"<form method='POST'>",
-		GetFormButton("delgroup", "Delete the group", {GroupName = GroupName}),
+		GetFormButton("delgroup", "确认删除", {GroupName = GroupName}),
 		"</form><form method='GET'>",
-		GetFormButton("", "Do NOT delete", {}),
+		GetFormButton("", "取消", {}),
 		"</form>"
 	}
 	return con(Page)
@@ -196,7 +196,7 @@ local function ShowDelGroupPage(a_Request)
 	-- Check params:
 	local GroupName = a_Request.PostParams["GroupName"]
 	if (GroupName == nil) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Remove the group:
@@ -204,9 +204,9 @@ local function ShowDelGroupPage(a_Request)
 	
 	-- Redirect the user:
 	return
-		"<p>Group removed. <a href='/" ..
+		"<p>已删除权限组 <a href='/" ..
 		a_Request.Path ..
-		"'>Return to group list</a>.</p>"
+		"'>返回列表</a>.</p>"
 end
 
 
@@ -220,7 +220,7 @@ local function ShowDelPermissionPage(a_Request)
 	local GroupName = a_Request.PostParams["GroupName"]
 	local Permission = a_Request.PostParams["Permission"]
 	if ((GroupName == nil) or (Permission == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Add the permission:
@@ -228,11 +228,11 @@ local function ShowDelPermissionPage(a_Request)
 	
 	-- Redirect the user:
 	return
-		"<p>Permission removed. <a href='/" ..
+		"<p>已删除权限 <a href='/" ..
 		a_Request.Path ..
 		"?subpage=edit&GroupName=" ..
 		cWebAdmin:GetHTMLEscapedString(GroupName) ..
-		"'>Return to group list</a>.</p>"
+		"'>返回列表</a>.</p>"
 end
 
 
@@ -246,7 +246,7 @@ local function ShowDelRestrictionPage(a_Request)
 	local GroupName = a_Request.PostParams["GroupName"]
 	local Restriction = a_Request.PostParams["Restriction"]
 	if ((GroupName == nil) or (Restriction == nil)) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Add the permission:
@@ -254,11 +254,11 @@ local function ShowDelRestrictionPage(a_Request)
 	
 	-- Redirect the user:
 	return
-		"<p>Restriction removed. <a href='/" ..
+		"<p>已删除限制 <a href='/" ..
 		a_Request.Path ..
 		"?subpage=edit&GroupName=" ..
 		cWebAdmin:GetHTMLEscapedString(GroupName) ..
-		"'>Return to group</a>.</p>"
+		"'>返回列表</a>.</p>"
 end
 
 
@@ -270,49 +270,49 @@ local function ShowEditGroupPage(a_Request)
 	-- Check params:
 	local GroupName = a_Request.PostParams["GroupName"]
 	if (GroupName == nil) then
-		return HTMLError("Bad request, missing parameters.")
+		return HTMLError("请求错误：缺少必要参数")
 	end
 	
 	-- Add the header for adding permissions:
 	local Page = {[[
-		<p><a href='/]] .. a_Request.Path .. [['>Return to the group list</a>.</p>
+		<p><a href='/]] .. a_Request.Path .. [['>返回列表</a></p>
 		<table><tr><td width='50%' valign='top'>
-		<h4>Add a permission</h4>
-		<form method='POST'><table><tr><td>Permission</td><td width='1px'><input type='text' size='40' name='Permission'/></td><td width='1px'>
+		<h4>添加权限</h4>
+		<form method='POST'><table><tr><td>权限</td><td width='1px'><input type='text' size='40' name='Permission'/></td><td width='1px'>
 	]]}
-	ins(Page, GetFormButton("addpermission", "Add permission", {GroupName = GroupName}))
+	ins(Page, GetFormButton("addpermission", "添加", {GroupName = GroupName}))
 	ins(Page, "</td></tr></table></form><br/><br/>")
 	
 	-- Add the permission list:
 	local Permissions = cRankManager:GetGroupPermissions(GroupName)
 	table.sort(Permissions)
-	ins(Page, "<h4>Group permissions</h4><table>")
+	ins(Page, "<h4>已添加权限</h4><table>")
 	for _, permission in ipairs(Permissions) do
 		ins(Page, "<tr><td>")
 		ins(Page, cWebAdmin:GetHTMLEscapedString(permission))
 		ins(Page, "</td><td><form method='POST'>")
-		ins(Page, GetFormButton("delpermission", "Remove permission", {GroupName = GroupName, Permission = permission}))
+		ins(Page, GetFormButton("delpermission", "删除", {GroupName = GroupName, Permission = permission}))
 		ins(Page, "</form></td></tr>")
 	end
 	ins(Page, "</table></td><td width='50%' valign='top'>")
 	
 	-- Add the header for adding restrictions:
 	ins(Page, [[
-		<h4>Add a restriction</h4>
-		<form method='POST'><table><tr><td>Restriction</td><td width='1px'><input type='text' size='40' name='Restriction'/></td><td width='1px'>
+		<h4>添加限制</h4>
+		<form method='POST'><table><tr><td>限制</td><td width='1px'><input type='text' size='40' name='Restriction'/></td><td width='1px'>
 	]])
-	ins(Page, GetFormButton("addrestriction", "Add restriction", {GroupName = GroupName}))
+	ins(Page, GetFormButton("addrestriction", "添加", {GroupName = GroupName}))
 	ins(Page, "</td></tr></table></form><br/><br/>")
 	
 	-- Add the restriction list:
 	local Restrictions = cRankManager:GetGroupRestrictions(GroupName)
 	table.sort(Restrictions)
-	ins(Page, "<h4>Group restrictions</h4><table>")
+	ins(Page, "<h4>已添加限制</h4><table>")
 	for _, restriction in ipairs(Restrictions) do
 		ins(Page, "<tr><td>")
 		ins(Page, cWebAdmin:GetHTMLEscapedString(restriction))
 		ins(Page, "</td><td><form method='POST'>")
-		ins(Page, GetFormButton("delrestriction", "Remove restriction", {GroupName = GroupName, Restriction = restriction}))
+		ins(Page, GetFormButton("delrestriction", "删除", {GroupName = GroupName, Restriction = restriction}))
 		ins(Page, "</form></td></tr>")
 	end
 	ins(Page, "</table></td></tr></table>")

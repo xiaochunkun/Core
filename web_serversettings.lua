@@ -21,7 +21,7 @@ local function ShowGeneralSettings(Request)
 	
 	local SettingsIni = cIniFile()
 	if not(SettingsIni:ReadFile("settings.ini")) then
-		InfoMsg = "<b style=\"color: red;\">ERROR: Could not read settings.ini!</b>"
+		InfoMsg = "<b style=\"color: red;\">错误: settings.ini 无法写入!</b>"
 	end
 	
 	if (Request.PostParams["general_submit"] ~= nil) then
@@ -52,48 +52,48 @@ local function ShowGeneralSettings(Request)
 		SettingsIni:SetValue("Authentication", "Address", AuthenticateAddress)
 
 		if not(SettingsIni:WriteFile("settings.ini")) then
-			InfoMsg =  [[<b style="color: red;">ERROR: Could not write to settings.ini!</b>]]
+			InfoMsg =  [[<b style="color: red;">错误: settings.ini 无法写入!</b>]]
 		else
-			InfoMsg = [[<b style="color: green;">INFO: Successfully saved changes to settings.ini</b>]]
+			InfoMsg = [[<b style="color: green;">更改已保存至 settings.ini</b>]]
 		end
 	end
 	
 	
 	Content = Content .. [[
 	<form method="POST">
-	<h4>General Settings</h4>]]
+	<h4>全局设置</h4>]]
 	
 	if (InfoMsg ~= nil) then
 		Content = Content .. "<p>" .. InfoMsg .. "</p>"
 	end
 	Content = Content .. [[
 	<table>
-	<th colspan="2">Server</th>
-	<tr><td style="width: 50%;">Description:</td>
+	<th colspan="2">服务器</th>
+	<tr><td style="width: 50%;">描述(MOTD):</td>
 	<td><input type="text" name="Server_Description" value="]] .. SettingsIni:GetValue("Server", "Description") .. [["></td></tr>
-	<tr><td>Max Players:</td>
+	<tr><td>最大玩家数:</td>
 	<td><input type="text" name="Server_MaxPlayers" value="]] .. SettingsIni:GetValue("Server", "MaxPlayers") .. [["></td></tr>
-	<tr><td>Ports:</td>
+	<tr><td>端口:</td>
 	<td><input type="text" name="Server_Ports" value="]] .. SettingsIni:GetValue("Server", "Ports") .. [["></td></tr>
-	<tr><td>Default ViewDistance:</td>
+	<tr><td>可视距离:</td>
 	<td><input type="text" name="Server_ViewDistance" value="]] .. SettingsIni:GetValueI("Server", "DefaultViewDistance") .. [["></td></tr>
-	<tr><td>Hardcore:</td>
+	<tr><td>极限模式:</td>
 	<td>]] .. HTML_Select_On_Off("Server_Hardcore", SettingsIni:GetValueI("Server", "HardcoreEnabled")) .. [[</tr>
 	</table><br />
 	
 	<table>
-	<th colspan="2">Authentication</th>
-	<tr><td style="width: 50%;">Authenticate:</td>
+	<th colspan="2">正版验证</th>
+	<tr><td style="width: 50%;">是否启用:</td>
 	<td>]] .. HTML_Select_On_Off("Authentication_Authenticate", SettingsIni:GetValueI("Authentication", "Authenticate") ) .. [[</td></tr>
-	<tr><td>Allow BungeeCord:</td>
+	<tr><td>启用 BC 互通服 模式</td>
 	<td>]] .. HTML_Select_On_Off("Authentication_AllowBungee", SettingsIni:GetValueI("Authentication", "AllowBungeeCord")) .. [[</td></tr>
-	<tr><td>Authentication Server:</td>
+	<tr><td>验证服务器:</td>
 	<td><input type="text" name="Authentication_Server" value="]] .. SettingsIni:GetValue("Authentication", "Server") .. [["></td></tr>
-	<tr><td>Authentication Address:</td>
+	<tr><td>验证 API:</td>
 	<td><input type="text" name="Authentication_Address" value="]] .. SettingsIni:GetValue("Authentication", "Address") .. [["></td></tr>
 	</table><br />
 	
-	<input type="submit" value="Save Settings" name="general_submit"> WARNING: Any changes made here might require a server restart in order to be applied!
+	<input type="submit" value="保存" name="general_submit"> 注意：只有在服务器完全重启后，本页面的更改才会生效！
 	</form>]]
 	
 	return Content
@@ -107,7 +107,7 @@ local function ShowWorldsSettings(Request)
 	
 	local SettingsIni = cIniFile()
 	if not(SettingsIni:ReadFile("settings.ini")) then
-		InfoMsg = [[<b style="color: red;">ERROR: Could not read settings.ini!</b>]]
+		InfoMsg = [[<b style="color: red;">错误: settings.ini 无法写入!</b>]]
 	end
 	
 	if (Request.PostParams["RemoveWorld"] ~= nil) then
@@ -116,7 +116,7 @@ local function ShowWorldsSettings(Request)
 		local KeyIdx = SettingsIni:FindKey("Worlds")
 		local WorldName = SettingsIni:GetValue(KeyIdx, WorldIdx)
 		if (SettingsIni:DeleteValueByID(KeyIdx, WorldIdx) == true) then
-			InfoMsg = "<b style=\"color: green;\">INFO: Successfully removed world " .. WorldName .. "!</b><br />"
+			InfoMsg = "<b style=\"color: green;\">成功删除世界 " .. WorldName .. "!</b><br />"
 			bSaveIni = true
 		end
 	end
@@ -124,7 +124,7 @@ local function ShowWorldsSettings(Request)
 	if (Request.PostParams["AddWorld"] ~= nil) then
 		if (Request.PostParams["WorldName"] ~= nil and Request.PostParams["WorldName"] ~= "") then
 			SettingsIni:AddValue("Worlds", "World", Request.PostParams["WorldName"])
-			InfoMsg = "<b style=\"color: green;\">INFO: Successfully added world " .. Request.PostParams["WorldName"] .. "!</b><br />"
+			InfoMsg = "<b style=\"color: green;\">成功创建世界 " .. Request.PostParams["WorldName"] .. "!</b><br />"
 			bSaveIni = true
 		end
 	end
@@ -142,13 +142,13 @@ local function ShowWorldsSettings(Request)
 	if (bSaveIni) then
 		if (InfoMsg == nil) then InfoMsg = "" end
 		if not(SettingsIni:WriteFile("settings.ini")) then
-			InfoMsg = InfoMsg .. "<b style=\"color: red;\">ERROR: Could not write to settings.ini!</b>"
+			InfoMsg = InfoMsg .. "<b style=\"color: red;\">错误: settings.ini 无法写入!</b>"
 		else
-			InfoMsg = InfoMsg .. "<b style=\"color: green;\">INFO: Successfully saved changes to settings.ini</b>"
+			InfoMsg = InfoMsg .. "<b style=\"color: green;\">更改已保存至 settings.ini</b>"
 		end
 	end
 	
-	Content = Content .. "<h4>Worlds Settings</h4>"
+	Content = Content .. "<h4>世界列表</h4>"
 	if( InfoMsg ~= nil ) then
 		Content = Content .. "<p>" .. InfoMsg .. "</p>"
 	end
@@ -156,8 +156,8 @@ local function ShowWorldsSettings(Request)
 	Content = Content .. [[
 	<form method="POST">
 	<table>
-	<th colspan="2">Worlds</th>
-	<tr><td style="width: 50%;">Default World:</td>
+	<th colspan="2">世界列表</th>
+	<tr><td style="width: 50%;">默认世界:</td>
 	<td><input type="Submit" name="Worlds_DefaultWorld" value="]] .. SettingsIni:GetValue("Worlds", "DefaultWorld") .. [["></td></tr>]]
 	
 	local KeyIdx = SettingsIni:FindKey("Worlds")
@@ -167,16 +167,16 @@ local function ShowWorldsSettings(Request)
 		if( ValueName == "World" ) then
 			local WorldName = SettingsIni:GetValue(KeyIdx, i)
 			Content = Content .. [[
-			<tr><td>]] .. ValueName .. [[:</td><td><div style="width: 100px; display: inline-block;">]] .. WorldName .. [[</div><input type="submit" value="Remove ]] .. i .. [[" name="RemoveWorld"></td></tr>]]
+			<tr><td>]] .. ValueName .. [[:</td><td><div style="width: 100px; display: inline-block;">]] .. WorldName .. [[</div><input type="submit" value="移除 ]] .. i .. [[" name="RemoveWorld"></td></tr>]]
 		end
 	end
 	
 	Content = Content .. [[
-	<tr><td>Add World:</td>
-	<td><input type='text' name='WorldName'><input type='submit' name='AddWorld' value='Add World'></td></tr>
+	<tr><td>创建世界:</td>
+	<td><input type='text' name='WorldName'><input type='submit' name='AddWorld' value='创建'></td></tr>
 	</table><br />
 	
-	<input type="submit" value="Save Settings" name="worlds_submit"> WARNING: Any changes made here might require a server restart in order to be applied!
+	<input type="submit" value="保存" name="worlds_submit"> 注意：只有在服务器完全重启后，本页面的更改才会生效！
 	</form>]]
 	return Content
 end
@@ -186,7 +186,7 @@ end
 
 
 local function SelectWorldButton(WorldName)
-	return "<form method='POST'><input type='hidden' name='WorldName' value='"..WorldName.."'><input type='submit' name='SelectWorld' value='Select'></form>"
+	return "<form method='POST'><input type='hidden' name='WorldName' value='"..WorldName.."'><input type='submit' name='SelectWorld' value='选择'></form>"
 end
 
 local function HTML_Select_Dimension(Name, DefaultValue)
@@ -333,16 +333,16 @@ function ShowWorldSettings(Request)
 	
 	if (SettingLayout == slEasy) then
 		Content = Content .. '<form method="Post">'
-		Content = Content .. 'Change Web Layout to: <input type="submit" name="ChangeWebLayout" value="Advanced" />'
+		Content = Content .. '将操作模式改为: <input type="submit" name="ChangeWebLayout" value="Advanced" />'
 		Content = Content .. '</form><br />'
 		Content = Content .. GetEasyWorldSettings(Request)
 	elseif (SettingLayout == slAdvanced) then
 		Content = Content .. '<form method="Post">'
-		Content = Content .. 'Change Web Layout to: <input type="submit" name="ChangeWebLayout" value="Easy" />'
+		Content = Content .. '将操作模式改为: <input type="submit" name="ChangeWebLayout" value="Easy" />'
 		Content = Content .. '</form><br />'
 		Content = Content .. GetAdvancedWorldSettings(Request)
 	else
-		Content = Content .. '<b style="red">The web type is unknown. Switching to easy layout.<br />'
+		Content = Content .. '<b style="red">未知的操作模式，已改为简单模式<br />'
 		Content = Content .. GetEasyWorldSettings(Request)
 		SettingLayout = slEasy
 	end
@@ -359,7 +359,7 @@ function GetEasyWorldSettings(Request)
 	local InfoMsg = nil
 	local SettingsIni = cIniFile()
 	if not(SettingsIni:ReadFile("settings.ini")) then
-		InfoMsg = [[<b style="color: red;">ERROR: Could not read settings.ini!</b>]]
+		InfoMsg = [[<b style="color: red;">错误：无法读取 settings.ini!</b>]]
 	end
 	if (Request.PostParams["SelectWorld"] ~= nil and Request.PostParams["WorldName"] ~= nil) then		-- World is selected!
 		SelectedWorld = cRoot:Get():GetWorld(Request.PostParams["WorldName"])
@@ -417,7 +417,7 @@ function GetEasyWorldSettings(Request)
 		WorldIni:WriteFile(SelectedWorld:GetIniFileName())
 	end
 
-	Content = Content .. "<h4>World for operations: " .. SelectedWorld:GetName() .. "</h4>"
+	Content = Content .. "<h4>正在操作的世界: " .. SelectedWorld:GetName() .. "</h4>"
 	Content = Content .. "<table>"
 	local WorldNum = 0
 	local AddWorldToTable = function(World)
@@ -434,94 +434,94 @@ function GetEasyWorldSettings(Request)
 	Content = Content .. [[<table>
 	<form method="POST">
 	<br />
-	<th colspan="2">General</th>
-	<tr><td style="width: 50%;">Dimension:</td>
+	<th colspan="2">全局</th>
+	<tr><td style="width: 50%;">维度:</td>
 	<td>]] .. HTML_Select_Dimension("General_Dimension", WorldIni:GetValue("General", "Dimension")) .. [[</td></tr>
-	<tr><td>Daylight Cycle Enabled:</td>
+	<tr><td>启用日夜循环:</td>
 	<td>]] .. HTML_Select_On_Off("General_DaylightCycle", WorldIni:GetValueI("General", "IsDaylightCycleEnabled")) .. [[</td></tr>
-	<tr><td>Default GameMode:</td>
+	<tr><td>默认游戏模式:</td>
 	<td>]] .. HTML_Select_GameMode("General_GameMode", WorldIni:GetValueI("General", "Gamemode")) .. [[</td></tr>
 
-	<th colspan="2">Broadcasting</th>
-	<tr><td>Death Messages:</td>
+	<th colspan="2">消息</th>
+	<tr><td>死亡消息:</td>
 	<td>]] .. HTML_Select_On_Off("Broadcasting_DeathMessages", WorldIni:GetValueI("Broadcasting", "BroadcastDeathMessages")) .. [[</td></tr>
-	<tr><td>Achievement Messages:</td>
+	<tr><td>成就广播:</td>
 	<td>]] .. HTML_Select_On_Off("Broadcasting_AchievementMessages", WorldIni:GetValueI("Broadcasting", "BroadcastAchievementMessages")) .. [[</td></tr>
 
-	<th colspan="2">Spawn Position</th>
+	<th colspan="2">出生点</th>
 	<tr><td>X:</td>
 	<td><input type="text" name="Spawn_X" value="]] .. WorldIni:GetValue("SpawnPosition", "X") .. [["></td></tr>
 	<tr><td>Y:</td>
 	<td><input type="text" name="Spawn_Y" value="]] .. WorldIni:GetValue("SpawnPosition", "Y") .. [["></td></tr>
 	<tr><td>Z:</td>
 	<td><input type="text" name="Spawn_Z" value="]] .. WorldIni:GetValue("SpawnPosition", "Z") .. [["></td></tr>
-	<tr><td>Max View Distance:</td>
+	<tr><td>最大视距:</td>
 	<td>]] .. HTML_Select_Number("Spawn_MaxViewDistance", cClientHandle.MIN_VIEW_DISTANCE, cClientHandle.MAX_VIEW_DISTANCE, WorldIni:GetValueI("SpawnPosition", "MaxViewDistance")) .. [[</td></tr>
-	<tr><td>Pregenerate Distance:</td>
+	<tr><td>预生成距离:</td>
 	<td><input type="text" name="Spawn_PregenerateDistance" value="]] .. WorldIni:GetValue("SpawnPosition", "PregenerateDistance") .. [["></td></tr>
-	<tr><td>Protection Radius:</td>
+	<tr><td>保护区域:</td>
 	<td><input type="text" name="Spawn_ProtectionRadius" value="]] .. WorldIni:GetValue("SpawnProtect", "ProtectRadius") .. [["></td></tr>
 
-	<th colspan="2">Storage</th>
-	<tr><td>Schema:</td>
+	<th colspan="2">存储</th>
+	<tr><td>架构:</td>
 	<td>]] .. HTML_Select_Scheme("Storage_Schema", WorldIni:GetValue("Storage", "Schema")) .. [[</td></tr>
-	<tr><td>Compression Factor:</td>
+	<tr><td>压缩系数:</td>
 	<td>]] .. HTML_Select_Number("Storage_CompressionFactor", 0, 6, WorldIni:GetValueI("Storage", "CompressionFactor")) .. [[</td></tr>
 
-	<th colspan="2">Physics</th>
-	<tr><td>Deep snow:</td>
+	<th colspan="2">物理效果</th>
+	<tr><td>雪层叠加:</td>
 	<td>]] .. HTML_Select_On_Off("Physics_DeepSnow", WorldIni:GetValueI("Physics", "DeepSnow")) .. [[</td></tr>
-	<tr><td>Should lava spawn fire:</td>
+	<tr><td>岩浆引起的火焰:</td>
 	<td>]] .. HTML_Select_On_Off("Physics_ShouldLavaSpawnFire", WorldIni:GetValueI("Physics", "ShouldLavaSpawnFire")) .. [[</td></tr>
-	<tr><td>TNT Shrapnel Level:</td>
+	<tr><td>TNT 弹片水平:</td>
 	<td>]] .. HTML_Select_Shrapnel_Level("Physics_TNTShrapnelLevel", WorldIni:GetValueI("Physics", "TNTShrapnelLevel")) .. [[</td></tr>
-	<tr><td>Sand Instant Fall:</td>
+	<tr><td>沙子快速下落:</td>
 	<td>]] .. HTML_Select_On_Off("Physics_SandInstantFall", WorldIni:GetValueI("Physics", "SandInstantFall")) .. [[</td></tr>
-	<tr><td>Water Simulator:</td>
+	<tr><td>水流流动:</td>
 	<td>]] .. HTML_Select_Fluid_Simulator("Physics_WaterSimulator", WorldIni:GetValue("Physics", "WaterSimulator"))  .. [[</td></tr>
-	<tr><td>Lava Simulator:</td>
+	<tr><td>岩浆流动:</td>
 	<td>]] .. HTML_Select_Fluid_Simulator("Physics_LavaSimulator", WorldIni:GetValue("Physics", "LavaSimulator")) .. [[</td></tr>
-	<tr><td>Redstone Simulator:</td>
+	<tr><td>启用红石:</td>
 	<td>]] .. HTML_Select_Redstone_Simulator("Physics_RedstoneSimulator", WorldIni:GetValue("Physics", "RedstoneSimulator")) .. [[</td></tr>
 
-	<th colspan="2">Mechanics</th>
-	<tr><td>Command blocks:</td>
+	<th colspan="2">交互</th>
+	<tr><td>启用命令方块:</td>
 	<td>]] .. HTML_Select_On_Off("Mechanics_CommandBlocksEnabled", WorldIni:GetValueI("Mechanics", "CommandBlocksEnabled")) .. [[</td></tr>
 	<tr><td>PVP:</td>
 	<td>]] .. HTML_Select_On_Off("Mechanics_PVPEnabled", WorldIni:GetValueI("Mechanics", "PVPEnabled")) .. [[</td></tr>
-	<tr><td>Use Chat Prefixes:</td>
+	<tr><td>使用聊天前缀:</td>
 	<td>]] .. HTML_Select_On_Off("Mechanics_UseChatPrefixes", WorldIni:GetValueI("Mechanics", "UseChatPrefixes")) .. [[</td></tr>
 
-	<th colspan="2">Monsters</th>
-	<tr><td>Should villagers harvest crops:</td>
+	<th colspan="2">生物</th>
+	<tr><td>村民收割农作物:</td>
 	<td>]] .. HTML_Select_On_Off("Monsters_VillagersShouldHarvestCrops", WorldIni:GetValueI("Monsters", "VillagersShouldHarvestCrops")) .. [[</td></tr>
-	<tr><td>Animals on:</td>
+	<tr><td>启用动物:</td>
 	<td>]] .. HTML_Select_On_Off("Monsters_AnimalsOn", WorldIni:GetValueI("Monsters", "AnimalsOn")) .. [[</td></tr>
-	<tr><td>Types (Only this types will spawn):</td>
+	<tr><td>可生成生物:</td>
 	<td><input type="text" name="Monsters_Types" value="]] .. WorldIni:GetValue("Monsters", "Types") .. [["></td></tr>
 
-	<th colspan="2">Seed</th>
-	<tr><td>Seed:</td>
+	<th colspan="2">种子</th>
+	<tr><td>世界种子:</td>
 	<td><input type="text" name="Seed" value="]] .. WorldIni:GetValue("Seed", "Seed") .. [["></td></tr>
 
-	<th colspan="2">Generator</th>
-	<tr><td>Generator:</td>
+	<th colspan="2">世界生成</th>
+	<tr><td>生成模型:</td>
 	<td>]] .. HTML_Select_Generator("Generator", WorldIni:GetValue("Generator", "Generator")) .. [[</td></tr>
-	<tr><td>Biome Generator:</td>
+	<tr><td>生物群系生成器:</td>
 	<td>]] .. HTML_Select_BiomeGen("Generator_BiomeGen", WorldIni:GetValue("Generator", "BiomeGen")) .. [[</td></tr>
-	<tr><td>Height Generator:</td>
+	<tr><td>高度生成器:</td>
 	<td>]] .. HTML_Select_HeightGen("Generator_HeightGen", WorldIni:GetValue("Generator", "HeightGen")) .. [[</td></tr>
-	<tr><td>Shape Generator:</td>
+	<tr><td>形状生成器:</td>
 	<td>]] .. HTML_Select_ShapeGen("Generator_ShapeGen", WorldIni:GetValue("Generator", "ShapeGen")) .. [[</td></tr>
-	<tr><td style="width: 50%;">Composition Generator:</td>
+	<tr><td style="width: 50%;">预设生成器:</td>
 	<td>]] .. HTML_Select_CompositionGen("Generator_CompositionGen", WorldIni:GetValue("Generator", "CompositionGen") ) .. [[</td></tr>
-	<tr><td>Finishers:</td>
+	<tr><td>修饰模型:</td>
 	<td><input type="text" name="Generator_Finishers" value="]] .. WorldIni:GetValue("Generator", "Finishers") .. [["></td></tr>
 	]]
 	Content = Content .. [[</table>]]
 	
 	Content = Content .. [[ <br />
-	<input type="submit" value="Save Settings" name="world_submit"> </form>WARNING: Any changes made here might require a server restart in order to be applied!
+	<input type="submit" value="保存" name="world_submit"> </form>注意：只有在服务器完全重启后，本页面的更改才会生效！
 	</form>]]
 	return Content
 end
@@ -562,7 +562,7 @@ function GetAdvancedWorldSettings(Request)
 		File:close()
 	end
 	
-	Content = Content .. "<h4>World for operations: " .. WORLD .. "</h4>"
+	Content = Content .. "<h4>正在操作的世界: " .. WORLD .. "</h4>"
 	Content = Content .. "<table>"
 	local WorldNum = 0
 	cRoot:Get():ForEachWorld(
@@ -582,7 +582,7 @@ function GetAdvancedWorldSettings(Request)
 	
 	<form method="post">
 	<textarea style="width: 100%; height: 500px;" name="WorldIniContent">]] .. WorldIniContent .. [[</textarea>
-	<input type="submit" value="Save Settings" name="world_submit"> WARNING: Any changes made here might require a server restart in order to be applied!
+	<input type="submit" value="保存" name="world_submit"> 注意：只有在服务器完全重启后，本页面的更改才会生效！
 	</form>]]
 	return Content
 end
@@ -593,12 +593,12 @@ function HandleRequest_ServerSettings(Request)
 	local Content = ""
 
 	Content = Content .. [[
-	<p><b>Server Settings</b></p>
+	<p><b>服务器设置</b></p>
 	<table>
 	<tr>
-	<td><a href="?tab=General">General</a></td>
-	<td><a href="?tab=Worlds">Worlds</a></td>
-	<td><a href="?tab=World">World</a></td>
+	<td><a href="?tab=General">全局</a></td>
+	<td><a href="?tab=Worlds">世界列表</a></td>
+	<td><a href="?tab=World">世界</a></td>
 	</tr>
 	</table>
 	<br />]]
